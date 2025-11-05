@@ -796,4 +796,3 @@ class PandasMmcif:
                 f.write(' '.join(values) + '\n')
 
             f.write("#\n")
->>>>>>> 7482f15 (Add CIF file support with align/tmalign improvements)
