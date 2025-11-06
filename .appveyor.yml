@@ -1,5 +1,8 @@
 build: false
 
+platform:
+  - x64
+
 environment:
   matrix:
     - PYTHON_VERSION: 3.7
@@ -11,12 +14,7 @@ environment:
     - PYTHON_VERSION: "3.10"
       MINICONDA: C:\Miniconda3
     - PYTHON_VERSION: 3.11
-      MINICONDA: C:\Miniconda3
-
-matrix:
-  exclude:
-    - platform: x86
-      PYTHON_VERSION: 3.11
+      MINICONDA: C:\Miniconda3-x64
 
 init:
   - ECHO %PYTHON_VERSION% %MINICONDA%
