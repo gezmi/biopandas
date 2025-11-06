@@ -7,6 +7,7 @@
 from biopandas.stack.stack import PandasPdbStack
 from biopandas.align import TMAlign
 import os
+import pytest
 
 TESTDATA_FILENAME = os.path.join(os.path.dirname(__file__), "data", "3eiy.pdb")
 
@@ -16,6 +17,16 @@ TESTDATA_FILENAME3 = os.path.join(
 TESTDATA_FILENAME4 = os.path.join(
     os.path.dirname(__file__), "data", "2d7t.pdb"
 )
+
+def has_usalign():
+    # Check if USalign exists in expected locations
+    paths = [
+        './biopandas/align/USalign',
+        './biopandas/align/USalign.exe',
+        '../../biopandas/align/USalign',
+        '../../biopandas/align/USalign.exe'
+    ]
+    return any(os.path.exists(p) for p in paths)
 
 # Helper functions for testing
 def filter_by_chain(key, pdb, chain):
@@ -96,6 +107,7 @@ def filter_by_chains(key, pdb, chains):
     pdb.df['ATOM'] = pdb.df['ATOM'].query('chain_id==@chain')
     return pdb
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_inside_multiple_chains():
     stack = PandasPdbStack()
     stack.add_pdbs([TESTDATA_FILENAME, TESTDATA_FILENAME3, TESTDATA_FILENAME4])
@@ -113,6 +125,7 @@ def test_tmalign_inside_multiple_chains():
     assert tm_scores['2d7t'] == 0.27812
     assert tm_scores['1ycr_copy'] == 1
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_inside_multiple_chains_specific_target():
     stack = PandasPdbStack()
     stack.add_pdbs([TESTDATA_FILENAME, TESTDATA_FILENAME3, TESTDATA_FILENAME4])

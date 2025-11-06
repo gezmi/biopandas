@@ -27,6 +27,17 @@ TESTDATA_FILENAME4 = os.path.join(
 
 OUTFILE = os.path.join(os.path.dirname(__file__), "data", "tmp.pdb")
 
+def has_usalign():
+    # Check if USalign exists in expected locations
+    paths = [
+        './biopandas/align/USalign',
+        './biopandas/align/USalign.exe',
+        '../../biopandas/align/USalign',
+        '../../biopandas/align/USalign.exe'
+    ]
+    return any(os.path.exists(p) for p in paths)
+
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_init():
     tmalign = TMAlign()
 
@@ -36,6 +47,7 @@ def test_init():
     else:
         assert 'USalign' in tmalign.tmalign_path
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_init_with_path_ok():
     if sys.platform == 'win32':
         tmalign = TMAlign(os.path.join(os.path.dirname(__file__), "../../biopandas/align/USalign.exe"))
@@ -59,6 +71,7 @@ def test_init_with_path_none():
         with pytest.raises(ValueError):
             TMAlign(None)
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_parse_tmalign_rotation_matrix():
     tmalign = TMAlign()
     matrix, translation = tmalign.parse_tmalign_rotation_matrix(
@@ -70,11 +83,13 @@ def test_parse_tmalign_rotation_matrix():
     assert matrix[0, 0] == 0.9999934600
     assert matrix[0, 1] == 0.0029980568
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_parse_tmalign_rotation_matrix_file_not_found():
     tmalign = TMAlign()
     with pytest.raises(FileNotFoundError):
         tmalign.parse_tmalign_rotation_matrix('file_not_found.txt')
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_run_tmalign():
     tmalign = TMAlign()
     matrix_file_path, tm_score = tmalign.run_tmalign(TESTDATA_FILENAME, TESTDATA_FILENAME)
@@ -82,6 +97,7 @@ def test_run_tmalign():
     assert matrix_file_path.endswith('.txt')
     assert tm_score == 1
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_run_tmalign_file_not_found():
     tmalign = TMAlign()
     with pytest.raises(FileNotFoundError):
@@ -89,11 +105,13 @@ def test_run_tmalign_file_not_found():
     with pytest.raises(FileNotFoundError):
         tmalign.run_tmalign('file_not_found.txt', TESTDATA_FILENAME)
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_run_tmalign_structure_too_short():
     tmalign = TMAlign()
     with pytest.raises(ValueError):
         tmalign.run_tmalign(TESTDATA_FILENAME, TESTDATA_FILENAME2)
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_process_structure_for_tmalign_perfect():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -120,6 +138,7 @@ def test_process_structure_for_tmalign_perfect():
     assert tm_score == 1
     assert np.allclose(coords_transformed, coords_mobile, atol=1e-3)
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_process_structure_for_tmalign_protein_rna():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -132,6 +151,7 @@ def test_process_structure_for_tmalign_protein_rna():
 
     assert tm_score == 0.16383
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_to_stack_chains_exist():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -147,6 +167,7 @@ def test_tmalign_to_stack_chains_exist():
     assert tm_scores['2d7t'] == 0.32871
     assert tm_scores['3eiy'] == 1
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_to_stack_chains_missing():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -158,6 +179,7 @@ def test_tmalign_to_stack_chains_missing():
     with pytest.raises(ValueError):
         tmalign.tmalign_to(ppdb, ppdb_stack, 'A', {'2jyf': 'A', '2d7t': 'H'})
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_to_stack_chains_not_exist():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -169,6 +191,7 @@ def test_tmalign_to_stack_chains_not_exist():
     with pytest.raises(ValueError):
         tmalign.tmalign_to(ppdb, ppdb_stack, 'A', {'2jyf': 'A', '2d7t': 'A'})
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_to_one():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -179,6 +202,7 @@ def test_tmalign_to_one():
     transformed_structures, tm_score = tmalign.tmalign_to(ppdb, ppdb2, 'A', 'A')
     assert tm_score == 0.16382
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_chain_missing():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -191,6 +215,7 @@ def test_tmalign_chain_missing():
     with pytest.raises(ValueError):
         tmalign.tmalign_to(ppdb, ppdb2, 'B', 'A')
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_to_wrong_input():
     tmalign = TMAlign()
     ppdb = PandasPdb()
@@ -201,6 +226,7 @@ def test_tmalign_to_wrong_input():
     with pytest.raises(ValueError):
         tmalign.tmalign_to(ppdb, 'random_string', 'A', 'A')
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_in_stack():
     tmalign = TMAlign()
 
@@ -214,6 +240,7 @@ def test_tmalign_in_stack():
     assert tm_scores == {'2d7t': 0.27812, '3eiy': 0.23483, '4LWV': 0.92383}
     assert target_pdb_id == '1ycr'
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_in_stack_define_target():
     tmalign = TMAlign()
 
@@ -227,6 +254,7 @@ def test_tmalign_in_stack_define_target():
     assert tm_scores == {'1ycr': 0.33733, '3eiy': 0.24401, '4LWV': 0.30331}
     assert target_pdb_id == '2d7t'
 
+@pytest.mark.skipif(not has_usalign(), reason="USalign executable not found")
 def test_tmalign_in_stack_define_target_not_exist():
     tmalign = TMAlign()
 
