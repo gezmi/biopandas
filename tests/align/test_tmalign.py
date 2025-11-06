@@ -8,7 +8,7 @@ import os
 import sys
 
 import numpy as np
-from nose.tools import assert_raises
+import pytest
 
 from biopandas.align import TMAlign, Align
 from biopandas.pdb import PandasPdb
@@ -45,7 +45,8 @@ def test_init_with_path_ok():
     assert 'USalign' in tmalign.tmalign_path
 
 def test_init_with_path_not_ok():
-    assert_raises(FileNotFoundError, TMAlign, 'fake_Usalign')
+    with pytest.raises(FileNotFoundError):
+        TMAlign('fake_Usalign')
 
 def test_init_with_path_none():
     if os.path.exists(os.path.join(os.path.dirname(__file__), "../../biopandas/align/USalign.exe")):
@@ -55,7 +56,8 @@ def test_init_with_path_none():
         tmalign = TMAlign()
         assert 'USalign' in tmalign.tmalign_path
     else:
-        assert_raises(ValueError, TMAlign, None)
+        with pytest.raises(ValueError):
+            TMAlign(None)
 
 def test_parse_tmalign_rotation_matrix():
     tmalign = TMAlign()
@@ -70,7 +72,8 @@ def test_parse_tmalign_rotation_matrix():
 
 def test_parse_tmalign_rotation_matrix_file_not_found():
     tmalign = TMAlign()
-    assert_raises(FileNotFoundError, tmalign.parse_tmalign_rotation_matrix, 'file_not_found.txt')
+    with pytest.raises(FileNotFoundError):
+        tmalign.parse_tmalign_rotation_matrix('file_not_found.txt')
 
 def test_run_tmalign():
     tmalign = TMAlign()
@@ -81,12 +84,15 @@ def test_run_tmalign():
 
 def test_run_tmalign_file_not_found():
     tmalign = TMAlign()
-    assert_raises(FileNotFoundError, tmalign.run_tmalign, TESTDATA_FILENAME, 'file_not_found.txt')
-    assert_raises(FileNotFoundError, tmalign.run_tmalign, 'file_not_found.txt', TESTDATA_FILENAME)
+    with pytest.raises(FileNotFoundError):
+        tmalign.run_tmalign(TESTDATA_FILENAME, 'file_not_found.txt')
+    with pytest.raises(FileNotFoundError):
+        tmalign.run_tmalign('file_not_found.txt', TESTDATA_FILENAME)
 
 def test_run_tmalign_structure_too_short():
     tmalign = TMAlign()
-    assert_raises(ValueError, tmalign.run_tmalign, TESTDATA_FILENAME, TESTDATA_FILENAME2)
+    with pytest.raises(ValueError):
+        tmalign.run_tmalign(TESTDATA_FILENAME, TESTDATA_FILENAME2)
 
 def test_process_structure_for_tmalign_perfect():
     tmalign = TMAlign()
@@ -149,7 +155,8 @@ def test_tmalign_to_stack_chains_missing():
     ppdb_stack = PandasPdbStack()
     ppdb_stack.add_pdbs([TESTDATA_FILENAME, TESTDATA_FILENAME3, TESTDATA_FILENAME4])
 
-    assert_raises(ValueError, tmalign.tmalign_to, ppdb, ppdb_stack, 'A', {'2jyf': 'A', '2d7t': 'H'})
+    with pytest.raises(ValueError):
+        tmalign.tmalign_to(ppdb, ppdb_stack, 'A', {'2jyf': 'A', '2d7t': 'H'})
 
 def test_tmalign_to_stack_chains_not_exist():
     tmalign = TMAlign()
@@ -159,7 +166,8 @@ def test_tmalign_to_stack_chains_not_exist():
     ppdb_stack = PandasPdbStack()
     ppdb_stack.add_pdbs([TESTDATA_FILENAME3, TESTDATA_FILENAME4])
 
-    assert_raises(ValueError, tmalign.tmalign_to, ppdb, ppdb_stack, 'A', {'2jyf': 'A', '2d7t': 'A'})
+    with pytest.raises(ValueError):
+        tmalign.tmalign_to(ppdb, ppdb_stack, 'A', {'2jyf': 'A', '2d7t': 'A'})
 
 def test_tmalign_to_one():
     tmalign = TMAlign()
@@ -178,8 +186,10 @@ def test_tmalign_chain_missing():
     ppdb2 = PandasPdb()
     ppdb2.read_pdb(TESTDATA_FILENAME3)
 
-    assert_raises(ValueError, tmalign.tmalign_to, ppdb, ppdb2, 'A', 'H')
-    assert_raises(ValueError, tmalign.tmalign_to, ppdb, ppdb2, 'B', 'A')
+    with pytest.raises(ValueError):
+        tmalign.tmalign_to(ppdb, ppdb2, 'A', 'H')
+    with pytest.raises(ValueError):
+        tmalign.tmalign_to(ppdb, ppdb2, 'B', 'A')
 
 def test_tmalign_to_wrong_input():
     tmalign = TMAlign()
@@ -188,7 +198,8 @@ def test_tmalign_to_wrong_input():
     ppdb2 = PandasPdb()
     ppdb2.read_pdb(TESTDATA_FILENAME3)
 
-    assert_raises(ValueError, tmalign.tmalign_to, ppdb, 'random_string', 'A', 'A')
+    with pytest.raises(ValueError):
+        tmalign.tmalign_to(ppdb, 'random_string', 'A', 'A')
 
 def test_tmalign_in_stack():
     tmalign = TMAlign()
@@ -224,4 +235,5 @@ def test_tmalign_in_stack_define_target_not_exist():
 
     chains = {'1ycr': 'A', '2d7t': 'H', '3eiy': 'A', '4LWV': 'A'}
 
-    assert_raises(ValueError, tmalign.tmalign_in_stack, ppdb_stack, chains, target='random')
+    with pytest.raises(ValueError):
+        tmalign.tmalign_in_stack(ppdb_stack, chains, target='random')

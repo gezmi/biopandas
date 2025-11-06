@@ -7,7 +7,6 @@
 from biopandas.stack.stack import PandasPdbStack
 from biopandas.align import TMAlign
 import os
-from nose.tools import assert_raises
 
 TESTDATA_FILENAME = os.path.join(os.path.dirname(__file__), "data", "3eiy.pdb")
 

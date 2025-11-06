@@ -4,7 +4,7 @@
 # Project Website: http://rasbt.github.io/biopandas/
 # Code Repository: https://github.com/rasbt/biopandas
 
-from nose.tools import assert_raises
+import pytest
 from biopandas.pdb import PandasPdb
 from biopandas.align import Align
 import numpy as np
@@ -50,6 +50,7 @@ def test_filter_and_validate_chain():
     filtered_pdb = align.filter_and_validate_chain(ppdb, 'A')
     assert filtered_pdb.df['ATOM']['chain_id'].unique() == ['A']
 
-    assert_raises(ValueError, align.filter_and_validate_chain, ppdb, 'B')
+    with pytest.raises(ValueError):
+        align.filter_and_validate_chain(ppdb, 'B')
 
 

@@ -5,7 +5,7 @@
 # Code Repository: https://github.com/rasbt/biopandas
 
 from biopandas.stack.stack import PandasPdbStack
-from nose.tools import assert_raises
+import pytest
 import os
 
 TESTDATA_FILENAME = os.path.join(os.path.dirname(__file__), "data", "3eiy.pdb")
@@ -114,24 +114,30 @@ def test_add_to_key():
 
 def test_add_pdb_nonexistent():
     stack = PandasPdbStack()
-    assert_raises(FileNotFoundError, stack.add_pdb, 'nonexistent.pdb')
+    with pytest.raises(FileNotFoundError):
+        stack.add_pdb('nonexistent.pdb')
 
 def test_add_mmcifnonexistent():
     stack = PandasPdbStack()
-    assert_raises(FileNotFoundError, stack.add_pdbs, ['nonexistent.cif'])
+    with pytest.raises(FileNotFoundError):
+        stack.add_pdbs(['nonexistent.cif'])
 
-def test_add_random_id ():
+def test_add_random_id():
     stack = PandasPdbStack()
-    assert_raises(ValueError, stack.add_pdb, 'AGDHK')
+    with pytest.raises(ValueError):
+        stack.add_pdb('AGDHK')
 
 def test_wrong_input():
     stack = PandasPdbStack()
-    assert_raises(TypeError, stack.add_pdb, 1234)
+    with pytest.raises(TypeError):
+        stack.add_pdb(1234)
 
 def test_fetch_pdb_uniprot_id():
     stack = PandasPdbStack()
-    assert_raises(ValueError, stack.fetch_pdb, uniprot_id='Q5VSL9', pdb_id='1YCR')
+    with pytest.raises(ValueError):
+        stack.fetch_pdb(uniprot_id='Q5VSL9', pdb_id='1YCR')
 
 def test_fetch_no_id():
     stack = PandasPdbStack()
-    assert_raises(ValueError, stack.fetch_pdb)
+    with pytest.raises(ValueError):
+        stack.fetch_pdb()
