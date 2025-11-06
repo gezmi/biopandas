@@ -13,6 +13,10 @@ environment:
     - PYTHON_VERSION: 3.11
       MINICONDA: C:\Miniconda3
 
+matrix:
+  exclude:
+    - platform: x86
+      PYTHON_VERSION: 3.11
 
 init:
   - ECHO %PYTHON_VERSION% %MINICONDA%
